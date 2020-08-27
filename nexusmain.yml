@@ -113,6 +113,21 @@ items:
       targetPort: 5000
     selector:
       app: nexus
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: release
+    name: release
+    namespace: infraproject
+  spec:
+    ports:
+    - name: release
+      port: 5005
+      protocol: TCP
+      targetPort: 5005
+    selector:
+      app: nexus
 
 - apiVersion: networking.k8s.io/v1beta1
   kind: Ingress
@@ -147,4 +162,21 @@ items:
         - backend:
             serviceName: nexus
             servicePort: 80
+- apiVersion: networking.k8s.io/v1beta1
+  kind: Ingress
+  metadata:
+    namespace: infraproject
+    name: nexusdocker
+    annotations:
+      # use the shared ingress-nginx
+      kubernetes.io/ingress.class: "nginx"
+      nginx.ingress.kubernetes.io/proxy-body-size: 8g
+  spec:
+    rules:
+    - host: release.sosiv.io
+      http:
+        paths:
+        - backend:
+            serviceName: docker
+            servicePort: 5005
 
